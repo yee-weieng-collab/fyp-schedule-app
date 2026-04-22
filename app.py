@@ -5,7 +5,7 @@ import os
 
 # 1. Set page configuration
 st.set_page_config(
-    page_title="FYP Schedule Checker", 
+    page_title="DCS-FYP Schedule Checker", 
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -152,7 +152,7 @@ sticky_header_html = f"""
 
 <div class="sticky-header-container">
     <div class="header-title-box">
-        <h1>FYP Schedule Checker</h1>
+        <h1>Diploma in Computer Science FYP Schedule Checker</h1>
         <p>Semester Jan 2026</p>
     </div>
     <div class="header-logos-box">
