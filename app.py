@@ -93,7 +93,6 @@ st.divider()
 # 5. Lecturer Profiles (Fixed for Mobile - 4 in a line)
 st.subheader("Lecturer Profiles")
 
-# Function to read local images and convert to base64
 def get_image_html(img_path, caption):
     try:
         with open(img_path, "rb") as f:
@@ -102,13 +101,10 @@ def get_image_html(img_path, caption):
     except FileNotFoundError:
         img_src = "https://via.placeholder.com/130?text=No+Image"
         
-    # Written as a single line so Markdown doesn't treat it as a code block
     return f'<div style="flex: 1; text-align: center; min-width: 22%; padding: 0 5px;"><img src="{img_src}" style="width: 100%; max-width: 130px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"><p style="font-size: 0.85rem; margin-top: 8px; color: #1E3A8A; font-weight: 600; line-height: 1.2;">{caption}</p></div>'
 
-# Build the custom HTML Flexbox container in a single line
 lecturer_html = f'<div style="display: flex; flex-direction: row; justify-content: space-around; align-items: flex-start; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 10px;">{get_image_html("lim_seng_chee.png", "Ts. Dr. Lim Seng Chee")}{get_image_html("khor_jia_yun.png", "Ms. Khor Jia Yun")}{get_image_html("eng_yee_wei.png", "Mr. Eng Yee Wei")}{get_image_html("nursyahirah.png", "Ms. Syira")}</div>'
 
-# Inject the HTML directly into Streamlit
 st.markdown(lecturer_html, unsafe_allow_html=True)
 
 st.divider()
@@ -144,17 +140,24 @@ with st.container(border=True):
         st.error("Could not find the 'FYP Phase' column in your Google Sheet.")
         st.stop()
 
-    filter_col1, filter_col2 = st.columns(2)
+    # Changed to 3 columns to accommodate the new Student filter
+    filter_col1, filter_col2, filter_col3 = st.columns(3)
 
     with filter_col1:
+        students = ['All'] + sorted(list(df_phase['Student Name'].dropna().unique()))
+        selected_student = st.selectbox("Filter by Student", students)
+
+    with filter_col2:
         supervisors = ['All'] + sorted(list(df_phase['Supervisor'].dropna().unique()))
         selected_sup = st.selectbox("Filter by Supervisor", supervisors)
 
-    with filter_col2:
+    with filter_col3:
         examiners = ['All'] + sorted(list(df_phase['Examiner'].dropna().unique()))
         selected_exam = st.selectbox("Filter by Examiner", examiners)
 
 # Apply filters
+if selected_student != 'All':
+    df_phase = df_phase[df_phase['Student Name'] == selected_student]
 if selected_sup != 'All':
     df_phase = df_phase[df_phase['Supervisor'] == selected_sup]
 if selected_exam != 'All':
@@ -162,7 +165,8 @@ if selected_exam != 'All':
 
 # 8. Display Data Table
 st.markdown("<br>", unsafe_allow_html=True) 
-desired_columns = ['Time', 'Venue', 'Coach Name', 'Student Name', 'FYP Title', 'Supervisor', 'Examiner']
+# Updated column order: 'Student Name' is now first
+desired_columns = ['Student Name', 'Time', 'Venue', 'Coach Name', 'FYP Title', 'Supervisor', 'Examiner']
 actual_columns = [col for col in desired_columns if col in df_phase.columns]
 
 if df_phase.empty:
