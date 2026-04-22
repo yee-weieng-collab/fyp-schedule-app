@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import base64
+import os
 
 # 1. Set page configuration
 st.set_page_config(
@@ -8,24 +10,30 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. Custom CSS for Background, Logo, Green Gradient, Image Scaling, and Professional Styling
+# 2. Custom CSS for True Background Gradient and Professional Styling
 st.markdown("""
     <style>
-    /* --- PROFESSIONAL BACKGROUND & CARD EFFECT --- */
-    /* Target the main app background */
-    [data-testid="stAppViewContainer"] {
-        background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+    /* --- TRUE PROFESSIONAL BACKGROUND --- */
+    /* Target the absolute background of the app */
+    .stApp {
+        background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%) !important;
+    }
+    
+    /* Make the top header transparent so it doesn't block the gradient */
+    header[data-testid="stHeader"] {
+        background-color: transparent !important;
     }
     
     /* Make the main content area look like a floating white card */
     .block-container {
-        background-color: rgba(255, 255, 255, 0.95);
+        background-color: rgba(255, 255, 255, 0.95) !important;
         border-radius: 15px;
         padding-top: 2rem !important;
         padding-bottom: 3rem !important;
         margin-top: 2rem;
         margin-bottom: 2rem;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        max-width: 95%; /* Gives nice padding on the sides */
     }
     
     /* Style headers to a dark professional blue */
@@ -40,20 +48,8 @@ st.markdown("""
         color: white !important;
         font-weight: 600 !important;
     }
-    /* Hover effect for the green gradient */
     button[kind="primary"]:hover {
         background: linear-gradient(90deg, #0f8a80 0%, #31d46e 100%) !important;
-    }
-
-    /* --- MOBILE FRIENDLY LECTURER IMAGES --- */
-    /* Forces images to stay small and centered on mobile instead of taking up the whole screen */
-    [data-testid="stImage"] {
-        text-align: center;
-    }
-    [data-testid="stImage"] img {
-        max-width: 130px !important; /* Prevents stretching */
-        border-radius: 8px; /* Slight rounded corners for a professional look */
-        margin: 0 auto;
     }
 
     /* Style the data table */
@@ -69,7 +65,6 @@ st.markdown("""
 @st.cache_data(ttl=60)
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTrxhs8F35bpw09bdACGvLdoE08on92AHTr0Lkeg8d0GbAb6GmmMbePM-W1U-5Z0wsVA2gvwNNqLeJ_/pub?gid=87654321&single=true&output=csv"
-    
     df = pd.read_csv(sheet_url)
     df.columns = df.columns.str.strip()
     return df
@@ -80,14 +75,14 @@ except Exception as e:
     st.error(f"Could not load data from Google Sheets. Error: {e}")
     st.stop()
 
-# 4. Main Title & Logo (Side by side)
-header_col1, header_col2 = st.columns([1, 4]) # Adjust ratio if logo is too big/small
+# 4. Main Title & Logo
+header_col1, header_col2 = st.columns([1, 4]) 
 
 with header_col1:
     try:
         st.image("vitrox-logo.png", use_container_width=True)
     except FileNotFoundError:
-        st.info("Logo space: Please add 'vitrox-logo.png' to your folder.")
+        st.info("Logo space: Add 'vitrox-logo.png'")
 
 with header_col2:
     st.title("FYP Schedule Checker")
@@ -95,21 +90,37 @@ with header_col2:
 
 st.divider()
 
-# 5. Lecturer Profiles
+# 5. Lecturer Profiles (Fixed for Mobile - 4 in a line)
 st.subheader("Lecturer Profiles")
-img_col1, img_col2, img_col3, img_col4 = st.columns(4)
 
-try:
-    with img_col1:
-        st.image("lim_seng_chee.png", caption="Ts. Dr. Lim Seng Chee")
-    with img_col2:
-        st.image("khor_jia_yun.png", caption="Ms. Khor Jia Yun")
-    with img_col3:
-        st.image("eng_yee_wei.png", caption="Mr. Eng Yee Wei")
-    with img_col4:
-        st.image("nursyahirah.png", caption="Ms. Syira")
-except FileNotFoundError:
-    st.warning("Image files not found. Ensure lim_seng_chee.png, khor_jia_yun.png, eng_yee_wei.png, and nursyahirah.png are in your folder.")
+# Function to read local images and convert to base64 so HTML can display them
+def get_image_html(img_path, caption):
+    try:
+        with open(img_path, "rb") as f:
+            encoded = base64.b64encode(f.read()).decode()
+        img_src = f"data:image/png;base64,{encoded}"
+    except FileNotFoundError:
+        # Professional fallback if image is missing
+        img_src = "https://via.placeholder.com/130?text=No+Image"
+        
+    return f"""
+    <div style="flex: 1; text-align: center; min-width: 22%; padding: 0 5px;">
+        <img src="{img_src}" style="width: 100%; max-width: 130px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <p style="font-size: 0.85rem; margin-top: 8px; color: #1E3A8A; font-weight: 600; line-height: 1.2;">{caption}</p>
+    </div>
+    """
+
+# Build the custom HTML Flexbox container
+lecturer_html = f"""
+<div style="display: flex; flex-direction: row; justify-content: space-around; align-items: flex-start; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 10px;">
+    {get_image_html("lim_seng_chee.png", "Ts. Dr. Lim Seng Chee")}
+    {get_image_html("khor_jia_yun.png", "Ms. Khor Jia Yun")}
+    {get_image_html("eng_yee_wei.png", "Mr. Eng Yee Wei")}
+    {get_image_html("nursyahirah.png", "Ms. Syira")}
+</div>
+"""
+# Inject the HTML directly into Streamlit
+st.markdown(lecturer_html, unsafe_allow_html=True)
 
 st.divider()
 
@@ -180,7 +191,6 @@ st.divider()
 st.header("Cast Your Vote")
 st.info("Our DCS students FYP2 poster are ready to be viewed at Level 4, ViTrox College. Please cast your vote for the best FYP project.")
 
-# This button will use the gradient green CSS we added at the top
 st.link_button(
     "Click Here to Vote via Google Form", 
     "https://forms.gle/y7P84Fds8VKjziDJA", 
