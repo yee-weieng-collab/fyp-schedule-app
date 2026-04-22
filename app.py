@@ -93,32 +93,21 @@ st.divider()
 # 5. Lecturer Profiles (Fixed for Mobile - 4 in a line)
 st.subheader("Lecturer Profiles")
 
-# Function to read local images and convert to base64 so HTML can display them
+# Function to read local images and convert to base64
 def get_image_html(img_path, caption):
     try:
         with open(img_path, "rb") as f:
             encoded = base64.b64encode(f.read()).decode()
         img_src = f"data:image/png;base64,{encoded}"
     except FileNotFoundError:
-        # Professional fallback if image is missing
         img_src = "https://via.placeholder.com/130?text=No+Image"
         
-    return f"""
-    <div style="flex: 1; text-align: center; min-width: 22%; padding: 0 5px;">
-        <img src="{img_src}" style="width: 100%; max-width: 130px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <p style="font-size: 0.85rem; margin-top: 8px; color: #1E3A8A; font-weight: 600; line-height: 1.2;">{caption}</p>
-    </div>
-    """
+    # Written as a single line so Markdown doesn't treat it as a code block
+    return f'<div style="flex: 1; text-align: center; min-width: 22%; padding: 0 5px;"><img src="{img_src}" style="width: 100%; max-width: 130px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"><p style="font-size: 0.85rem; margin-top: 8px; color: #1E3A8A; font-weight: 600; line-height: 1.2;">{caption}</p></div>'
 
-# Build the custom HTML Flexbox container
-lecturer_html = f"""
-<div style="display: flex; flex-direction: row; justify-content: space-around; align-items: flex-start; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 10px;">
-    {get_image_html("lim_seng_chee.png", "Ts. Dr. Lim Seng Chee")}
-    {get_image_html("khor_jia_yun.png", "Ms. Khor Jia Yun")}
-    {get_image_html("eng_yee_wei.png", "Mr. Eng Yee Wei")}
-    {get_image_html("nursyahirah.png", "Ms. Syira")}
-</div>
-"""
+# Build the custom HTML Flexbox container in a single line
+lecturer_html = f'<div style="display: flex; flex-direction: row; justify-content: space-around; align-items: flex-start; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 10px;">{get_image_html("lim_seng_chee.png", "Ts. Dr. Lim Seng Chee")}{get_image_html("khor_jia_yun.png", "Ms. Khor Jia Yun")}{get_image_html("eng_yee_wei.png", "Mr. Eng Yee Wei")}{get_image_html("nursyahirah.png", "Ms. Syira")}</div>'
+
 # Inject the HTML directly into Streamlit
 st.markdown(lecturer_html, unsafe_allow_html=True)
 
