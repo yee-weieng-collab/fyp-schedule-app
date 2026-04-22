@@ -8,13 +8,24 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. Custom CSS for Green Gradient, Image Scaling, and Professional Styling
+# 2. Custom CSS for Background, Logo, Green Gradient, Image Scaling, and Professional Styling
 st.markdown("""
     <style>
-    /* Adjust main container padding */
+    /* --- PROFESSIONAL BACKGROUND & CARD EFFECT --- */
+    /* Target the main app background */
+    [data-testid="stAppViewContainer"] {
+        background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+    }
+    
+    /* Make the main content area look like a floating white card */
     .block-container {
-        padding-top: 2rem;
-        padding-bottom: 3rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding-top: 2rem !important;
+        padding-bottom: 3rem !important;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     }
     
     /* Style headers to a dark professional blue */
@@ -69,16 +80,25 @@ except Exception as e:
     st.error(f"Could not load data from Google Sheets. Error: {e}")
     st.stop()
 
-# 4. Main Title
-st.title("FYP Schedule Checker")
-st.markdown("**Semester Jan 2026**")
+# 4. Main Title & Logo (Side by side)
+header_col1, header_col2 = st.columns([1, 4]) # Adjust ratio if logo is too big/small
+
+with header_col1:
+    try:
+        st.image("vitrox_logo.png", use_container_width=True)
+    except FileNotFoundError:
+        st.info("Logo space: Please add 'vitrox_logo.png' to your folder.")
+
+with header_col2:
+    st.title("FYP Schedule Checker")
+    st.markdown("**Semester Jan 2026**")
+
 st.divider()
 
 # 5. Lecturer Profiles
 st.subheader("Lecturer Profiles")
 img_col1, img_col2, img_col3, img_col4 = st.columns(4)
 
-# Note: removed use_container_width=True so the custom CSS can control the size cleanly
 try:
     with img_col1:
         st.image("lim_seng_chee.png", caption="Ts. Dr. Lim Seng Chee")
