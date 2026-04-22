@@ -85,9 +85,9 @@ header_col1, header_col2 = st.columns([1, 4]) # Adjust ratio if logo is too big/
 
 with header_col1:
     try:
-        st.image("vitrox_logo.png", use_container_width=True)
+        st.image("vitrox-logo.png", use_container_width=True)
     except FileNotFoundError:
-        st.info("Logo space: Please add 'vitrox_logo.png' to your folder.")
+        st.info("Logo space: Please add 'vitrox-logo.png' to your folder.")
 
 with header_col2:
     st.title("FYP Schedule Checker")
