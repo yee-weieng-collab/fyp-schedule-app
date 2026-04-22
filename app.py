@@ -5,7 +5,7 @@ import os
 
 # 1. Set page configuration
 st.set_page_config(
-    page_title="DCS FYP Schedule Checker", 
+    page_title="FYP Schedule Checker", 
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -85,8 +85,7 @@ with header_col1:
         st.info("Logo space: Add 'vitrox-logo.png'")
 
 with header_col2:
-    st.title("Diploma in Computer Science FYP 1 and 2 Schedule Checker")
-    st.markdown("**School of Computing and Informatics (SoCI)**")
+    st.title("FYP Schedule Checker")
     st.markdown("**Semester Jan 2026**")
 
 st.divider()
@@ -114,7 +113,7 @@ st.divider()
 if 'phase' not in st.session_state:
     st.session_state.phase = 'FYP 1'
 
-st.subheader("View Schedules (Select correct FYP category before filter)")
+st.subheader("View Schedules")
 col1, col2 = st.columns(2)
 
 with col1:
@@ -141,7 +140,6 @@ with st.container(border=True):
         st.error("Could not find the 'FYP Phase' column in your Google Sheet.")
         st.stop()
 
-    # Changed to 3 columns to accommodate the new Student filter
     filter_col1, filter_col2, filter_col3 = st.columns(3)
 
     with filter_col1:
@@ -166,8 +164,9 @@ if selected_exam != 'All':
 
 # 8. Display Data Table
 st.markdown("<br>", unsafe_allow_html=True) 
-# Updated column order: 'Student Name' is now first
-desired_columns = ['Student Name', 'Time', 'Venue', 'Coach Name', 'FYP Title', 'Supervisor', 'Examiner']
+
+# -> ADDED 'Date' to the columns list right here!
+desired_columns = ['Student Name', 'Date', 'Time', 'Venue', 'Coach Name', 'FYP Title', 'Supervisor', 'Examiner']
 actual_columns = [col for col in desired_columns if col in df_phase.columns]
 
 if df_phase.empty:
