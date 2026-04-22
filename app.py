@@ -75,33 +75,94 @@ except Exception as e:
     st.error(f"Could not load data from Google Sheets. Error: {e}")
     st.stop()
 
-# 4. Main Title, Logo, & Flags Header
-# We use a [1.5, 4, 1, 1] ratio to give the title the most space, while keeping the flags neat on the right.
-col_logo, col_title, col_flag1, col_flag2 = st.columns([1.5, 4, 1, 1]) 
-
-with col_logo:
+# 4. FIXED STICKY HEADER (Title & Flags)
+# Helper function to convert local images to base64 for HTML embedding
+def get_base64_img(img_path):
     try:
-        st.image("vitrox-logo.png", use_container_width=True)
+        with open(img_path, "rb") as f:
+            encoded = base64.b64encode(f.read()).decode()
+        return f"data:image/png;base64,{encoded}"
     except FileNotFoundError:
-        st.info("Add 'vitrox-logo.png'")
+        return "https://via.placeholder.com/60?text=Missing"
 
-with col_title:
-    st.title("FYP Schedule Checker")
-    st.markdown("**Semester Jan 2026**")
+img_national = get_base64_img("national-flag.avif")
+img_penang = get_base64_img("penang-state-flag.avif")
+img_vitrox = get_base64_img("vitrox-logo.png")
 
-with col_flag1:
-    try:
-        st.image("national-flag.avif", use_container_width=True)
-    except FileNotFoundError:
-        st.info("Add 'national-flag.avif'")
+# HTML and CSS for a mobile-friendly, sticky row header
+sticky_header_html = f"""
+<style>
+.sticky-header-container {{
+    position: sticky;
+    top: 0px; /* Sticks to the top of the white card */
+    z-index: 9999;
+    background-color: rgba(255, 255, 255, 0.98); /* Solid white to hide scrolling text behind it */
+    padding: 10px 15px;
+    border-bottom: 2px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    margin-top: -10px; /* Pulls it up slightly to align with card top */
+}}
+.header-title-box h1 {{
+    margin: 0;
+    padding: 0;
+    font-size: 1.5rem;
+    color: #1E3A8A;
+    line-height: 1.2;
+}}
+.header-title-box p {{
+    margin: 0;
+    padding: 0;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #475569;
+}}
+.header-logos-box {{
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}}
+/* Shrink images for the row header */
+.header-logos-box img {{
+    height: 35px; 
+    width: auto;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}}
 
-with col_flag2:
-    try:
-        st.image("penang-state-flag.avif", use_container_width=True)
-    except FileNotFoundError:
-        st.info("Add 'penang-state-flag.avif'")
+/* Stack nicely if the phone screen is extremely narrow */
+@media (max-width: 600px) {{
+    .sticky-header-container {{
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        text-align: center;
+        padding-top: 15px;
+    }}
+    .header-logos-box img {{
+        height: 28px; /* Shrink even more for small phones */
+    }}
+    .header-title-box h1 {{
+        font-size: 1.3rem;
+    }}
+}}
+</style>
 
-st.divider()
+<div class="sticky-header-container">
+    <div class="header-title-box">
+        <h1>FYP Schedule Checker</h1>
+        <p>Semester Jan 2026</p>
+    </div>
+    <div class="header-logos-box">
+        <img src="{img_national}" alt="National Flag" title="National Flag"/>
+        <img src="{img_penang}" alt="Penang Flag" title="Penang Flag"/>
+        <img src="{img_vitrox}" alt="ViTrox Logo" title="ViTrox College Logo"/>
+    </div>
+</div>
+"""
+st.markdown(sticky_header_html, unsafe_allow_html=True)
 
 # 5. Lecturer Profiles (Fixed for Mobile - 4 in a line)
 st.subheader("Lecturer Profiles")
@@ -110,8 +171,6 @@ def get_image_html(img_path, caption):
     try:
         with open(img_path, "rb") as f:
             encoded = base64.b64encode(f.read()).decode()
-        # Fallback to general data URI if browser doesn't strictly need mime type for avif/png here, 
-        # though we specify png, browsers are smart enough to render standard images.
         img_src = f"data:image/png;base64,{encoded}"
     except FileNotFoundError:
         img_src = "https://via.placeholder.com/130?text=No+Image"
