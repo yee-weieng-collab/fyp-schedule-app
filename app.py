@@ -93,7 +93,7 @@ with col_flag1:
     try:
         st.image("nation-flag.avif", use_container_width=True)
     except FileNotFoundError:
-        st.info("Add 'nation-flag.avif'")
+        st.info("Add 'national-flag.avif'")
 
 with col_flag2:
     try:
