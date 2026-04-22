@@ -6,7 +6,7 @@ st.set_page_config(page_title="FYP Schedule Checker", layout="wide")
 
 # 1. Mock Data (Replace this with pd.read_csv('your_file.csv') in the future)
 data = {
-    'FYP Phas': ['FYP 1', 'FYP 1', 'FYP 1', 'FYP 1', 'FYP 2', 'FYP 2', 'FYP 2', 'FYP 2'],
+    'FYP Phase': ['FYP 1', 'FYP 1', 'FYP 1', 'FYP 1', 'FYP 2', 'FYP 2', 'FYP 2', 'FYP 2'],
     'Date': ['24 April 2026', '24 April 2026', '24 April 2026', '24 April 2026', '30 April 2026', '30 April 2026', '30 April 2026', '30 April 2026'],
     'Time': ['2:00 PM - 2:30 PM', '2:45 PM - 3:15 PM', '10:30 AM - 11:00 AM', '9:45 AM - 10:15 AM', '10:30 AM - 11:00 AM', '1:30 PM - 2:00 PM', '2:15 PM - 2:45 PM', '3:00 PM - 3:30 PM'],
     'Student Name': ['Aaron Koay Beng Liang', 'Chan Qin Ken', 'Dedric Yee Qi Xian', 'Sim Zi Ming', 'Amelia Chan Bing Li', 'Celine Tan Si Ning', 'Goh Yee Ern', 'Leng Jung Xung'],
@@ -56,7 +56,7 @@ with col2:
 st.subheader(f"Showing schedules for: **{st.session_state.phase}**")
 
 # Filter data based on selected phase
-df_phase = df[df['FYP Phas'] == st.session_state.phase]
+df_phase = df[df['FYP Phase'] == st.session_state.phase]
 
 # 5. Dropdown Filters for Supervisor and Examiner
 filter_col1, filter_col2 = st.columns(2)
