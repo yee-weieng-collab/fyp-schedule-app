@@ -75,18 +75,31 @@ except Exception as e:
     st.error(f"Could not load data from Google Sheets. Error: {e}")
     st.stop()
 
-# 4. Main Title & Logo
-header_col1, header_col2 = st.columns([1, 4]) 
+# 4. Main Title, Logo, & Flags Header
+# We use a [1.5, 4, 1, 1] ratio to give the title the most space, while keeping the flags neat on the right.
+col_logo, col_title, col_flag1, col_flag2 = st.columns([1.5, 4, 1, 1]) 
 
-with header_col1:
+with col_logo:
     try:
         st.image("vitrox-logo.png", use_container_width=True)
     except FileNotFoundError:
-        st.info("Logo space: Add 'vitrox-logo.png'")
+        st.info("Add 'vitrox-logo.png'")
 
-with header_col2:
+with col_title:
     st.title("FYP Schedule Checker")
     st.markdown("**Semester Jan 2026**")
+
+with col_flag1:
+    try:
+        st.image("nation-flag.avif", use_container_width=True)
+    except FileNotFoundError:
+        st.info("Add 'nation-flag.avif'")
+
+with col_flag2:
+    try:
+        st.image("penang-state-flag.avif", use_container_width=True)
+    except FileNotFoundError:
+        st.info("Add 'penang-state-flag.avif'")
 
 st.divider()
 
@@ -97,6 +110,8 @@ def get_image_html(img_path, caption):
     try:
         with open(img_path, "rb") as f:
             encoded = base64.b64encode(f.read()).decode()
+        # Fallback to general data URI if browser doesn't strictly need mime type for avif/png here, 
+        # though we specify png, browsers are smart enough to render standard images.
         img_src = f"data:image/png;base64,{encoded}"
     except FileNotFoundError:
         img_src = "https://via.placeholder.com/130?text=No+Image"
@@ -165,7 +180,6 @@ if selected_exam != 'All':
 # 8. Display Data Table
 st.markdown("<br>", unsafe_allow_html=True) 
 
-# -> ADDED 'Date' to the columns list right here!
 desired_columns = ['Student Name', 'Date', 'Time', 'Venue', 'Coach Name', 'FYP Title', 'Supervisor', 'Examiner']
 actual_columns = [col for col in desired_columns if col in df_phase.columns]
 
