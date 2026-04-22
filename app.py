@@ -256,6 +256,8 @@ st.divider()
 # 9. Voting Section 
 st.header("Cast Your Vote")
 st.info("Our DCS students FYP2 poster are ready to be viewed at Level 4, ViTrox College. Please cast your vote for the best FYP project.")
+# Add a warning message to guide the user
+st.warning("⚠️ **For the best experience:** If you face any login issues, please ensure you open the Google Form using **Google Chrome**.")
 
 st.link_button(
     "Click Here to Vote via Google Form", 
