@@ -114,7 +114,7 @@ st.divider()
 if 'phase' not in st.session_state:
     st.session_state.phase = 'FYP 1'
 
-st.subheader("View Schedules")
+st.subheader("View Schedules (Select correct FYP category before filter)")
 col1, col2 = st.columns(2)
 
 with col1:
