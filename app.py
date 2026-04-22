@@ -91,7 +91,7 @@ with col_title:
 
 with col_flag1:
     try:
-        st.image("nation-flag.avif", use_container_width=True)
+        st.image("national-flag.avif", use_container_width=True)
     except FileNotFoundError:
         st.info("Add 'national-flag.avif'")
 
