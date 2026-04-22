@@ -5,7 +5,7 @@ import os
 
 # 1. Set page configuration
 st.set_page_config(
-    page_title="Diploma in Computer Science FYP 1 and 2 Schedule Checker (School of Computing and Informatics)", 
+    page_title="DCS FYP Schedule Checker", 
     layout="wide",
     initial_sidebar_state="collapsed"
 )
