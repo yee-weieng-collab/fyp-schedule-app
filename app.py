@@ -85,7 +85,8 @@ with header_col1:
         st.info("Logo space: Add 'vitrox-logo.png'")
 
 with header_col2:
-    st.title("FYP Schedule Checker")
+    st.title("Diploma in Computer Science FYP 1 and 2 Schedule Checker")
+    st.markdown("**School of Computing and Informatics (SoCI)**")
     st.markdown("**Semester Jan 2026**")
 
 st.divider()
