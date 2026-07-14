@@ -468,7 +468,7 @@ def get_base64_img(img_path):
 
 img_national = get_base64_img("national-flag.avif")
 img_penang = get_base64_img("penang-state-flag.avif")
-img_vitrox = get_base64_img("vitrox-logo.png")
+img_vitrox = get_base64_img("v-logo.jpeg")
 
 sticky_header_html = f"""
 <style>
