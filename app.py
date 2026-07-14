@@ -1,6 +1,23 @@
 import streamlit as st
 import pandas as pd
 import base64
+import html
+from pathlib import Path
+
+# Resolve images relative to this script so the app works no matter
+# which folder Streamlit is launched from
+APP_DIR = Path(__file__).parent
+
+# Self-contained grey placeholder (no internet needed) shown if an image file is missing
+PLACEHOLDER_IMG = (
+    "data:image/svg+xml;base64,"
+    + base64.b64encode(
+        b'<svg xmlns="http://www.w3.org/2000/svg" width="130" height="130">'
+        b'<rect width="130" height="130" fill="#e2e8f0"/>'
+        b'<text x="65" y="70" font-family="sans-serif" font-size="14" fill="#64748b" '
+        b'text-anchor="middle">No Image</text></svg>'
+    ).decode()
+)
 
 # ══════════════════════════════════════════════════════════════
 # 1. PAGE CONFIGURATION
@@ -23,6 +40,12 @@ st.markdown("""
     html, body, [class*="css"], .stMarkdown, button, input, select {
         font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif !important;
     }
+
+    /* ---------- HIDE STREAMLIT CHROME (menu, footer, toolbar) ---------- */
+    #MainMenu { visibility: hidden; }
+    footer { visibility: hidden; }
+    [data-testid="stToolbar"] { display: none !important; }
+    [data-testid="stDecoration"] { display: none !important; }
 
     /* ---------- APP BACKGROUND: layered professional gradient ---------- */
     .stApp {
@@ -51,6 +74,13 @@ st.markdown("""
             0 4px 12px rgba(15, 37, 87, 0.06);
         max-width: 1200px;
     }
+
+    /* ---------- ENTRANCE ANIMATION ---------- */
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeUp 0.55s ease both; }
 
     /* ---------- HEADINGS ---------- */
     h1, h2, h3 { color: #0f2557 !important; letter-spacing: -0.02em; }
@@ -117,14 +147,6 @@ st.markdown("""
         background: #f0fdf9 !important;
     }
 
-    /* ---------- DATA TABLE ---------- */
-    [data-testid="stDataFrame"] {
-        border-radius: 14px;
-        overflow: hidden;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 8px 20px -6px rgba(15, 37, 87, 0.12);
-    }
-
     /* ---------- FILTER CARD (st.container border) ---------- */
     [data-testid="stVerticalBlockBorderWrapper"] {
         border-radius: 16px !important;
@@ -136,6 +158,11 @@ st.markdown("""
     /* ---------- SELECTBOX ---------- */
     [data-testid="stSelectbox"] > div > div {
         border-radius: 10px !important;
+        border-color: #dbe4ef !important;
+    }
+    [data-testid="stSelectbox"] label {
+        font-weight: 600 !important;
+        color: #334155 !important;
     }
 
     /* ---------- ALERTS (info / warning) softer look ---------- */
@@ -164,6 +191,11 @@ st.markdown("""
         border-radius: 14px;
         padding: 14px 18px;
         box-shadow: 0 3px 10px -4px rgba(15, 37, 87, 0.10);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .stat-tile:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px -6px rgba(15, 37, 87, 0.18);
     }
     .stat-tile .stat-label {
         font-size: 0.72rem;
@@ -241,6 +273,104 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 0.06em;
         margin-top: 2px;
+    }
+
+    /* ---------- CUSTOM SCHEDULE TABLE ---------- */
+    .schedule-wrap {
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 8px 20px -6px rgba(15, 37, 87, 0.12);
+        overflow: hidden;
+        background: #ffffff;
+    }
+    .schedule-scroll {
+        max-height: 580px;
+        overflow: auto;
+    }
+    table.schedule {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.86rem;
+    }
+    table.schedule thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: linear-gradient(90deg, #0f2557 0%, #1E3A8A 100%);
+        color: #ffffff;
+        padding: 13px 14px;
+        text-align: left;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        white-space: nowrap;
+    }
+    table.schedule tbody td {
+        padding: 11px 14px;
+        border-bottom: 1px solid #eef2f7;
+        color: #334155;
+        vertical-align: top;
+        line-height: 1.45;
+    }
+    table.schedule tbody tr:nth-child(even) { background: #f8fafc; }
+    table.schedule tbody tr:hover { background: #ecfdf5; }
+    table.schedule tbody tr:last-child td { border-bottom: none; }
+
+    .td-student { font-weight: 700; color: #0f2557; white-space: nowrap; }
+    .td-title { min-width: 220px; color: #475569; }
+
+    .pill {
+        display: inline-block;
+        padding: 3px 11px;
+        border-radius: 999px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .pill-date  { background: #eff6ff; color: #1E3A8A; border: 1px solid #dbeafe; }
+    .pill-time  { background: #f0fdf4; color: #0f8a80; border: 1px solid #d1fae5; }
+    .pill-venue { background: #fef9ec; color: #b45309; border: 1px solid #fde8c8; }
+
+    .table-caption {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 0.78rem;
+        padding: 10px 0 2px 0;
+    }
+
+    /* Mobile: table collapses into stacked cards */
+    @media (max-width: 640px) {
+        .schedule-scroll { max-height: none; }
+        table.schedule thead { display: none; }
+        table.schedule, table.schedule tbody,
+        table.schedule tr, table.schedule td { display: block; width: 100%; }
+        table.schedule tbody tr {
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            margin: 12px 10px;
+            padding: 8px 2px;
+            background: #ffffff !important;
+            box-shadow: 0 3px 10px -4px rgba(15, 37, 87, 0.12);
+        }
+        table.schedule tbody td {
+            border: none;
+            padding: 5px 14px;
+            display: flex;
+            gap: 10px;
+            align-items: baseline;
+        }
+        table.schedule tbody td::before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: #64748b;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            min-width: 88px;
+            flex-shrink: 0;
+        }
+        .td-student, .td-title { white-space: normal; min-width: 0; }
     }
 
     /* ---------- VOTE CTA CARD ---------- */
@@ -323,13 +453,18 @@ except Exception as e:
 # ══════════════════════════════════════════════════════════════
 # 4. STICKY HERO HEADER (Title, Semester Badge & Flags)
 # ══════════════════════════════════════════════════════════════
+MIME_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+              ".avif": "image/avif", ".webp": "image/webp", ".gif": "image/gif"}
+
 def get_base64_img(img_path):
     try:
-        with open(img_path, "rb") as f:
+        path = APP_DIR / img_path
+        mime = MIME_TYPES.get(path.suffix.lower(), "image/png")
+        with open(path, "rb") as f:
             encoded = base64.b64encode(f.read()).decode()
-        return f"data:image/png;base64,{encoded}"
+        return f"data:{mime};base64,{encoded}"
     except FileNotFoundError:
-        return "https://via.placeholder.com/60?text=Missing"
+        return PLACEHOLDER_IMG
 
 img_national = get_base64_img("national-flag.avif")
 img_penang = get_base64_img("penang-state-flag.avif")
@@ -405,7 +540,7 @@ sticky_header_html = f"""
 }}
 </style>
 
-<div class="sticky-header-container">
+<div class="sticky-header-container fade-in">
     <div class="header-title-box">
         <h1>🎓 Diploma in Computer Science — FYP Schedule Checker</h1>
         <span class="sem-badge">Semester June 2026</span>
@@ -423,7 +558,7 @@ st.markdown(sticky_header_html, unsafe_allow_html=True)
 # 5. LECTURER PROFILES — hover cards with gradient photo rings
 # ══════════════════════════════════════════════════════════════
 st.markdown("""
-<div class="section-title">
+<div class="section-title fade-in">
     <div class="bar"></div>
     <h3>Panel of Lecturers</h3>
     <span class="subtitle">Supervisors &amp; Examiners</span>
@@ -431,12 +566,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def get_lecturer_card(img_path, caption, role="Lecturer"):
-    try:
-        with open(img_path, "rb") as f:
-            encoded = base64.b64encode(f.read()).decode()
-        img_src = f"data:image/png;base64,{encoded}"
-    except FileNotFoundError:
-        img_src = "https://via.placeholder.com/130?text=No+Image"
+    img_src = get_base64_img(img_path)
 
     return (
         f'<div class="lecturer-card">'
@@ -447,7 +577,7 @@ def get_lecturer_card(img_path, caption, role="Lecturer"):
     )
 
 lecturer_html = (
-    '<div class="lecturer-row">'
+    '<div class="lecturer-row fade-in">'
     + get_lecturer_card("lim_seng_chee.png", "Ts. Dr. Lim Seng Chee")
     + get_lecturer_card("khor_jia_yun.png", "Ms. Khor Jia Yun")
     + get_lecturer_card("eng_yee_wei.png", "Mr. Eng Yee Wei")
@@ -523,7 +653,7 @@ if selected_exam != 'All':
     df_phase = df_phase[df_phase['Examiner'] == selected_exam]
 
 # ══════════════════════════════════════════════════════════════
-# 8. AT-A-GLANCE STATS + DATA TABLE
+# 8. AT-A-GLANCE STATS + CUSTOM SCHEDULE TABLE
 # ══════════════════════════════════════════════════════════════
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -559,28 +689,53 @@ st.markdown(f"""
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-desired_columns = ['Student Name', 'Date', 'Time', 'Venue', 'Coach Name', 'FYP Title', 'Supervisor', 'Examiner']
+# Column display config: header label, cell CSS class, pill CSS class
+COLUMN_STYLES = {
+    'Student Name': ('👤 Student Name', 'td-student', None),
+    'Date':         ('📅 Date',        '',           'pill pill-date'),
+    'Time':         ('🕐 Time',        '',           'pill pill-time'),
+    'Venue':        ('📍 Venue',       '',           'pill pill-venue'),
+    'Coach Name':   ('🤝 Coach',       '',           None),
+    'FYP Title':    ('💡 FYP Title',   'td-title',   None),
+    'Supervisor':   ('🧑‍🏫 Supervisor', '',          None),
+    'Examiner':     ('📝 Examiner',    '',           None),
+}
+
+desired_columns = list(COLUMN_STYLES.keys())
 actual_columns = [col for col in desired_columns if col in df_phase.columns]
+
+def build_schedule_table(data, columns):
+    header_cells = "".join(
+        f"<th>{COLUMN_STYLES[c][0]}</th>" for c in columns
+    )
+    rows = []
+    for _, row in data.iterrows():
+        cells = []
+        for c in columns:
+            label, td_class, pill_class = COLUMN_STYLES[c]
+            raw = row[c]
+            value = "—" if pd.isna(raw) else html.escape(str(raw))
+            if pill_class and value != "—":
+                content = f'<span class="{pill_class}">{value}</span>'
+            else:
+                content = value
+            cls = f' class="{td_class}"' if td_class else ""
+            cells.append(f'<td{cls} data-label="{label}">{content}</td>')
+        rows.append(f"<tr>{''.join(cells)}</tr>")
+
+    return (
+        '<div class="schedule-wrap fade-in"><div class="schedule-scroll">'
+        f'<table class="schedule"><thead><tr>{header_cells}</tr></thead>'
+        f'<tbody>{"".join(rows)}</tbody></table>'
+        '</div></div>'
+        f'<div class="table-caption">Showing {len(data)} scheduled presentation(s) · '
+        'Data refreshes automatically every 60 seconds</div>'
+    )
 
 if df_phase.empty:
     st.info("🔎 No schedules found matching your current filters. Try widening your selection.")
 else:
-    st.dataframe(
-        df_phase[actual_columns],
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            "Student Name": st.column_config.TextColumn("👤 Student Name"),
-            "Date": st.column_config.TextColumn("📅 Date"),
-            "Time": st.column_config.TextColumn("🕐 Time"),
-            "Venue": st.column_config.TextColumn("📍 Venue"),
-            "Coach Name": st.column_config.TextColumn("🤝 Coach"),
-            "FYP Title": st.column_config.TextColumn("💡 FYP Title", width="large"),
-            "Supervisor": st.column_config.TextColumn("🧑‍🏫 Supervisor"),
-            "Examiner": st.column_config.TextColumn("📝 Examiner"),
-        }
-    )
-    st.caption(f"Showing {len(df_phase)} scheduled presentation(s) · Data refreshes automatically every 60 seconds")
+    st.markdown(build_schedule_table(df_phase, actual_columns), unsafe_allow_html=True)
 
 st.divider()
 
@@ -588,7 +743,7 @@ st.divider()
 # 9. VOTING SECTION — gradient call-to-action card
 # ══════════════════════════════════════════════════════════════
 st.markdown("""
-<div class="vote-card">
+<div class="vote-card fade-in">
     <span class="vote-badge">🏆 Poster Competition</span>
     <h2>Cast Your Vote for the Best FYP2 Poster</h2>
     <p>
@@ -610,6 +765,6 @@ st.link_button(
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("""
 <div class="app-footer">
-    <b>ViTrox College</b> · Diploma in Computer Science · Final Year Project — Semester Jan 2026
+    <b>ViTrox College</b> · Diploma in Computer Science · Final Year Project — Semester June 2026
 </div>
 """, unsafe_allow_html=True)
