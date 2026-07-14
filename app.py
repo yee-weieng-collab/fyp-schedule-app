@@ -408,7 +408,7 @@ sticky_header_html = f"""
 <div class="sticky-header-container">
     <div class="header-title-box">
         <h1>🎓 Diploma in Computer Science — FYP Schedule Checker</h1>
-        <span class="sem-badge">Semester Jan 2026</span>
+        <span class="sem-badge">Semester June 2026</span>
     </div>
     <div class="header-logos-box">
         <img src="{img_national}" alt="National Flag" title="National Flag"/>
